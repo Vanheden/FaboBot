@@ -1,17 +1,12 @@
 require('dotenv').config();
 
-const token = process.env.TOKEN;
-const prefix = process.env.PREFIX;
-
-const config = {
-    token: token,
-    prefix: prefix
-};
-
 const fs = require('fs');
 const path = require('path');
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
-const config = require('./config.json');
+
+// Load configuration from environment variables
+const token = process.env.TOKEN;
+const prefix = process.env.PREFIX;
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 client.commands = new Collection();
@@ -31,26 +26,26 @@ client.on('guildCreate', guild => {
     // Find a default channel to send the welcome message
     let defaultChannel = "";
     guild.channels.cache.forEach((channel) => {
-        if(channel.type === 0 && defaultChannel === "") {
-            if(channel.permissionsFor(guild.me).has("SEND_MESSAGES")) {
+        if (channel.type === 0 && defaultChannel === "") {
+            if (channel.permissionsFor(guild.me).has("SEND_MESSAGES")) {
                 defaultChannel = channel;
             }
         }
     });
-    
+
     // Send the welcome message to the default channel
     if (defaultChannel) {
         defaultChannel.send("Hello, I'm **FäboBot**, thanks for choosing me!");
     }
 });
 
-client.login(config.token);
+client.login(token);
 
 client.on('messageCreate', message => {
     if (message.author.bot) return;
-    if (!message.content.startsWith(config.prefix)) return;
+    if (!message.content.startsWith(prefix)) return;
 
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/);
+    const args = message.content.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
 
     if (!client.commands.has(commandName)) return;
